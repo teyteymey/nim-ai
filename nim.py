@@ -138,6 +138,46 @@ class NimAI():
                 max_reward = max(max_reward, self.get_q_value(state_key, action_key))
 
         return max_reward
+    
+
+    def best_future_reward_action(self, state):
+        """
+        Given a state `state`, consider all possible `(state, action)`
+        pairs available in that state and return the maximum of all
+        of their Q-values.
+
+        Use 0 as the Q-value if a `(state, action)` pair has no
+        Q-value in `self.q`. If there are no available actions in
+        `state`, return 0.
+        """
+        max_reward = 0
+        best_action = []
+        # conversion because it comes as a list
+        state = tuple(state)
+        for state_key, action_key  in self.q.keys():
+            if state == state_key:
+                q_value = self.get_q_value(state_key, action_key)
+                if q_value >= max_reward:
+                    max_reward = q_value
+                    best_action = action_key
+
+        return best_action
+    
+    @classmethod
+    def available_actions(cls, piles):
+        """
+        ~~~ Copied from Nim class ~~~
+        Nim.available_actions(piles) takes a `piles` list as input
+        and returns all of the available actions `(i, j)` in that state.
+
+        Action `(i, j)` represents the action of removing `j` items
+        from pile `i` (where piles are 0-indexed).
+        """
+        actions = set()
+        for i, pile in enumerate(piles):
+            for j in range(1, pile + 1):
+                actions.add((i, j))
+        return actions
 
 
     def choose_action(self, state, epsilon=True):
@@ -155,7 +195,16 @@ class NimAI():
         If multiple actions have the same Q-value, any of those
         options is an acceptable return value.
         """
-        raise NotImplementedError
+        rand_num = random.randint(0, 100)
+        # if random number is less or equal than epsilon in the range 1 to 100%, we return action at random
+        if epsilon and rand_num <= self.epsilon * 10:
+            possible_actions = self.available_actions(state)
+            random_action = random.randint(0, len(possible_actions)-1)
+            return list(possible_actions)[random_action]
+        
+        #if epsilon is false or probablility 1-epsilon happened
+        return self.best_future_reward_action(state)
+        
 
 
 def train(n):
