@@ -197,7 +197,7 @@ class NimAI():
         """
         rand_num = random.randint(0, 100)
         # if random number is less or equal than epsilon in the range 1 to 100%, we return action at random
-        if epsilon and rand_num <= self.epsilon * 10:
+        if epsilon and rand_num <= self.epsilon * 100:
             possible_actions = self.available_actions(state)
             random_action = random.randint(0, len(possible_actions)-1)
             return list(possible_actions)[random_action]
